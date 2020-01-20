@@ -29,10 +29,7 @@ int	ft_atoi(const char *str)
 		sign = -1;
 		str++;
 	}
-	while (ft_isdigit(*str))
-	{
-		result = 10 * result + (*str - '0');
-		str++;
-	}
+	while(ft_isdigit(*str))
+	      result = 10 * result + (*str++ - '0');
 	return (sign * result);
 }
