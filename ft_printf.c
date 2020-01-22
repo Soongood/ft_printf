@@ -50,19 +50,28 @@ void	parser_one(char **chunk, t_str *line)
 {
 	int		i;
 	char	tmp[5];
+	long	result;
 
 	i = 0;
+	result = 0;
 	is_flags(line, chunk);
 	ft_bzero(&tmp, sizeof(tmp));
 	while (ft_isdigit(**chunk))
-		*(tmp + i++) = *(*chunk)++;
+	{
+		*(tmp + i) = *(*chunk)++;
+		result = 10 * result + (*(tmp + i++) - '0');
+	}
 	if (*tmp)
-		line->width = ft_atoi(tmp), ft_bzero(&tmp, i);
+		line->width = result, ft_bzero(&tmp, i);
 	i = 0;
-	if (**chunk == '.' ? *(*(chunk))++ : 0)
+	result = 0;
+	if (**chunk == '.' ? *(*(chunk))++ : NOTHING)
 		while (ft_isdigit(**chunk))
-			*(tmp + i++) = *(*chunk)++;
-	line->precision = ft_atoi(tmp);
+		{
+			*(tmp + i) = *(*chunk)++;
+			result = 10 * result + (*(tmp + i++) - '0');
+		}
+	line->precision = result;
 }
 
 int		is_type(char chunk)
@@ -190,16 +199,16 @@ int	ft_printf(const char *format, ...)
 		else
 			parsing(&format, &line, ap);
 	va_end(ap);
-	ft_putstr(line.str);
+	write(1, line.str, ft_strlen(line.str));
 	return (0);
 }
 
 int		main()
 {
-	char *number = "dfgdsfgf";
+	char number = 348;
 
-//	ft_printf("%6s|\n", number);
-	printf("%p\n", &number);
+	ft_printf("%4.3c|\n", number);
+	printf("%4.3c|\n", number);
 //	printf("%-4cf\n", number); 
 	return (0);
 }

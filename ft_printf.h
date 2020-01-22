@@ -1,6 +1,7 @@
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
+# define NOTHING 0
 # define MINUS 1
 # define PLUS 2
 # define SPACE 4
