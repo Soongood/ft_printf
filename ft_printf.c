@@ -19,55 +19,50 @@ You must manage the precision
 
 typedef struct			s_str
 {
-	uint8_t				flags;
+	uint16_t				flags;
 	int					width;
 	int					precision;
 	char				specifier[2];
 	char				type[1];
+	char				str[1000];
+	char				*ptr;
 }						t_str; // не забыть выровнять
 
-int		is_flags(t_str *line, char *chunk)
+void	is_flags(t_str *line, char **chunk)
 {
-	int i;
-
-	i = 0;
-	while (chunk[i] == ' ' || chunk[i] == '#' || chunk[i] == '+' || chunk[i] == '-' || chunk[i] == '0')
+	while (**chunk == ' ' || **chunk == '#' || **chunk == '+' || **chunk == '-' || **chunk == '0')
 	{
-		if (chunk[i] == '-')
+		if (**chunk == '-')
 			line->flags |= MINUS;
-		if (chunk[i] == '+')
+		else if (**chunk == '+')
 			line->flags |= PLUS;
-		if (chunk[i] != ' ')
+		else if (**chunk != ' ')
 			line->flags |= SPACE;
-		if (chunk[i] != '0')
+		else if (**chunk != '0')
 			line->flags |= ZERO;
-		if (chunk[i] != '#')
+		else if (**chunk != '#')
 			line->flags |= SHARP;
-		i++;
+		(*chunk)++;
 	}
-	return (i);
 }
 
-void	parser_one(char *chunk, t_str *line, int *shift)
+void	parser_one(char **chunk, t_str *line)
 {
 	int		i;
-	int		j;
 	char	tmp[5];
 
 	i = 0;
-	j = 0;
+	is_flags(line, chunk);
 	ft_bzero(&tmp, sizeof(tmp));
-	j = is_flags(line, chunk);
+	while (ft_isdigit(**chunk))
+		*(tmp + i++) = *(*chunk)++;
+	if (*tmp)
+		line->width = ft_atoi(tmp), ft_bzero(&tmp, i);
 	i = 0;
-	while (ft_isdigit(chunk[j]))
-		tmp[i++] = chunk[j++];
-	*tmp ? line->width = ft_atoi(tmp), ft_bzero(&tmp, i) : 0;
-	i = 0;
-	if (chunk[j] == '.')
-		while (ft_isdigit(chunk[++j]))
-			tmp[i++] = chunk[j];
+	if (**chunk == '.' ? *(*(chunk))++ : 0)
+		while (ft_isdigit(**chunk))
+			*(tmp + i++) = *(*chunk)++;
 	line->precision = ft_atoi(tmp);
-	*shift += j;
 }
 
 int		is_type(char chunk)
@@ -83,110 +78,128 @@ int		is_specifier(char chunk)
 	return (chunk == 'l' || chunk == 'h');
 }
 
-int		parser_sec(t_str *line, char *chunk, int *shift)
+int		parser_sec(t_str *line, char **chunk)
 {
-	int i;
-
-	i = 0;
-	if (is_type(chunk[i++]))
-		line->type[0] = chunk[0];
-	else if (chunk[i++])
-		{
-			if (is_specifier(chunk[0]) && (chunk[0] == chunk[1]) && is_type(chunk[i]))
-				line->specifier[1] = (chunk[1]);
-			else if ((is_specifier(chunk[0]) || chunk[0] == 'L') && is_type(chunk[i - 1]))
-				i--;
-			else
-				return (1);
-			line->specifier[0] = chunk[0];
-			line->type[0] = chunk[i++];
-		}
+	if (is_type(**chunk))
+		line->type[0] = *(*chunk)++;
+	else if (*(*chunk + 1))
+	{
+		if (is_specifier(**chunk) && (**chunk == *(*chunk + 1)) && is_type(*(*chunk + 2)))
+			line->specifier[1] = *(*chunk)++;
+		else if ((is_specifier(**chunk) || (**chunk) == 'L') && is_type(*(*chunk + 1)))
+			;
 		else
 			return (1);
-	*shift += i;
+		line->specifier[0] = *(*chunk)++;
+		line->type[0] = *(*chunk)++;
+	}
+	else
+		return (1);
 	return (0);
 }
 
-void	c_type(t_str line, va_list list)
+void	c_type(t_str *line, va_list list)
 {
-	char	letter;
+	int flag;
 
-	letter = va_arg(list, int);
-	if (line.width)
-		if(line.flags == (line.flags | MINUS))
-			write(1, &letter, 1);
-	while (--line.width > 0)
-		write(1, " ", 1);
-	if(line.flags == (line.flags | MINUS))
-		return ;
-	write(1, &letter, 1);
+	flag = 0;
+	if (line->width)
+		if((line->flags == (line->flags | MINUS)) && (flag = -1))
+			*line->ptr++ = va_arg(list, int);
+	while (--line->width > 0)
+		*line->ptr++ = ' ';
+	if (!flag)
+		*line->ptr++ = va_arg(list, int);
 }
 
-void	handler(t_str line, va_list list)
+void	s_type(t_str *line, va_list list)
 {
-	if (*line.type == 'c')
+	int flag;
+	int size;
+	char *tmp;
+
+	flag = 0;
+	tmp = va_arg(list, char *);
+	size = ft_strlen(tmp);
+	if (line->width)
+	{
+		if((line->flags == (line->flags | MINUS)) && (flag = -1))
+			while (*tmp)
+				*line->ptr++ = *tmp++;
+		while (line->width-- > size)
+			*line->ptr++ = ' ';
+		if (flag == -1)
+			return ;
+	}
+	while (*tmp)
+		*line->ptr++ = *tmp++;
+}
+
+void	p_type(t_str *line, va_list list)
+{
+	int		num;
+	ssize_t ptr;
+
+	ptr = va_arg(list, long long int);
+	while (num = (ptr /= 16))
+	{
+		
+	}
+}
+
+void	handler(t_str *line, va_list list)
+{
+	if (*line->type == 'c')
 		c_type(line, list);
-	// if (*line.type == 'd' || *line.type == 'i')
-	// 	*shift = d_type(line, list);
-	// if (*line.type == 's')
-	// 	*shift = s_type(line, list);
-	// if (*line.type == 'o')
-	// 	*shift = o_type(line, list);
-	// if (*line.type == 'f')
-	// 	*shift = f_type(line, list);
-	// if (*line.type == 'u')
-	// 	*shift = u_type(line, list);
-	// if (*line.type == 'p')
-	// 	*shift = p_type(line, list);
-	// if (*line.type == 'x' || *line.type == 'X')
-	// 	*shift = x_type(line, list);
+	if (*line->type == 's')
+		s_type(line, list);
+	// if (*line->type == 'd' || *line->type == 'i')
+	// 	d_type(line, list);
+	// if (*line->type == 'o')
+	// 	o_type(line, list);
+	// if (*line->type == 'f')
+	// 	f_type(line, list);
+	// if (*line->type == 'u')
+	// 	u_type(line, list);
+	if (*line->type == 'p')
+	 	p_type(line, list);
+	// if (*line->type == 'x' || *line.type == 'X')
+	// 	x_type(line, list);
 }
 
-int		parsing(char *chunk, t_str line, va_list list)
+int		parsing(char **chunk, t_str *line, va_list list)
 {
-	int shift;
-	
-	shift = 0;
-	parser_one(chunk, &line, &shift);
-	if (!(parser_sec(&line, chunk + shift, &shift)))
+	parser_one(chunk, line);
+	if (!(parser_sec(line, chunk)))
 		handler(line, list);
-	return (shift);
 }
 
 int	ft_printf(const char *format, ...)
 {
-	int		size;
-	char	*tmp;
 	t_str	line;
 	va_list	ap;
 
-	size = 0;
-	tmp = format;
 	ft_bzero(&line, sizeof(line));
+	line.ptr = line.str;
 	va_start(ap, format);
 	while (*format)
-		if (*format++ != '%')
-			size++;
-		else if (*format == '%' && tmp++ && format++)
-				size++;
+		if (*format != '%')
+			*line.ptr++ = *format++;
+		else if (*format++ == '%' && *format == '%')
+			*line.ptr++ = *format++;
 		else
-		{
-			write(1, tmp, size);
-			size = 0;
-			format += parsing(format, line, ap);
-			tmp = format;
-		}
+			parsing(&format, &line, ap);
 	va_end(ap);
-	write(1, tmp, size);
+	ft_putstr(line.str);
 	return (0);
 }
 
 int		main()
 {
-	char number = 348;
+	char *number = "dfgdsfgf";
 
-	ft_printf("%-4cf\n", number);
-	printf("%4cf\n", number);
-	printf("%-4cf\n", number); 
+//	ft_printf("%6s|\n", number);
+	printf("%p\n", &number);
+//	printf("%-4cf\n", number); 
 	return (0);
 }
