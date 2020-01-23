@@ -141,7 +141,7 @@ void	s_type(t_str *line, va_list list)
 			return ;
 	}
 	while (*tmp)
-		*line->ptr++ = *tmp++;
+		*line->ptr++ = *tmp++; //Добавить обработку точности
 }
 
 void	p_type(t_str *line, va_list list)
