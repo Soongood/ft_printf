@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <math.h>
 #include <ieee754.h>
 
 
@@ -26,6 +27,7 @@ typedef struct			s_str
 	uintmax_t			num_u;
 	double				num_d;
 	char				tmp;
+	int					prec_f;
 	int					width;
 	int					precision;
 	char				base;
@@ -36,7 +38,7 @@ typedef struct			s_str
 	char				*ptr;
 }						t_str; // не забыть выровнять
 
-void	is_flags(t_str *line, char **chunk)
+void	is_flags(t_str *line, const char **chunk)
 {
 	while (**chunk == ' ' || **chunk == '#' || **chunk == '+' || **chunk == '-' || **chunk == '0')
 	{
@@ -54,7 +56,7 @@ void	is_flags(t_str *line, char **chunk)
 	}
 }
 
-void	parser_one(char **chunk, t_str *line)
+void	parser_one(const char **chunk, t_str *line)
 {
 	char	i;
 	char	tmp[5];
@@ -87,7 +89,7 @@ int		is_type(char chunk)
 	return (chunk == 'p' || chunk == 'c' || chunk == 's' ||
 			chunk == 'd' || chunk == 'i' || chunk == 'o' ||
 			chunk == 'u' || chunk == 'x' || chunk == 'X' ||
-			chunk == 'f');
+			chunk == 'f' || chunk == 'b');
 }
 
 int		is_specifier(char chunk)
@@ -95,7 +97,7 @@ int		is_specifier(char chunk)
 	return (chunk == 'l' || chunk == 'h');
 }
 
-int		parser_sec(t_str *line, char **chunk)
+int		parser_sec(t_str *line, const char **chunk)
 {
 	if (is_type(**chunk))
 		line->type[0] = *(*chunk)++;
@@ -115,7 +117,7 @@ int		parser_sec(t_str *line, char **chunk)
 	return (0);
 }
 
-int		c_type(t_str *line, int letter)
+int	c_type(t_str *line, int letter)
 {
 	char flag;
 
@@ -152,6 +154,12 @@ int		s_type(t_str *line, char *string)
 	while (line->precision ? *string && tmp_pre-- : *string)
 		*line->ptr++ = *string++;
 	return (0);
+}
+
+void sharp(t_str *line)
+{
+	*line->ptr++ = '0';
+	*line->ptr++ = 'x';
 }
 
 int		p_type(t_str *line, uintmax_t pointer)
@@ -199,7 +207,7 @@ int		base_num_u(t_str *line, uintmax_t number)
 {
 	char		num;
 
-	if (number >= line->base)
+	if (number >= (uintmax_t)line->base)
 		base_num_u(line, number / line->base);
 	num = number % line->base;
 	*line->ptr++ = (num >= 10) ? line->letter + num - 10 : '0' + num;
@@ -216,8 +224,12 @@ int		base_num(t_str *line, intmax_t number)
 
 void	loop_w(t_str *line, char num)
 {
+	if (*line->type == 'f' && (line->num < 0) && (line->precision >= 0) && !num)
+		*line->ptr++ = '-';
 	while (line->width-- > line->tmp)
 		*line->ptr++ = num == 1 ? ' ' : '0';
+	if (*line->type == 'f' && line->num_u && (line->precision >= 0) && (num == 1))
+		*line->ptr++ = '-';
 }
 
 void	loop_p(t_str *line, char *u_base)
@@ -226,7 +238,7 @@ void	loop_p(t_str *line, char *u_base)
 		*line->ptr++ = '0';
 }
 
-void	u_type(t_str *line, char u_base)
+int		u_type(t_str *line, char u_base)
 {
 	line->tmp = u_base > line->precision ? u_base : line->precision;
 	line->tmp += ((*line->type == 'x' || *line->type == 'X') && (line->flags == (line->flags | SHARP))) ? 2 : 0;
@@ -237,7 +249,7 @@ void	u_type(t_str *line, char u_base)
 		loop_p(line, &u_base);
 		base_num_u(line, line->num_u);
 		loop_w(line, 1);
-		return ;
+		return (0);
 	}
 	if (line->precision || !line->flags)
 	{
@@ -253,9 +265,10 @@ void	u_type(t_str *line, char u_base)
 		loop_w(line, 0);
 	}
 	base_num_u(line, line->num_u);
+	return (0);
 }
 
-void	i_type(t_str *line, char base)
+int		i_type(t_str *line, char base)
 {
 	line->tmp = base > line->precision ? base : line->precision;
 	line->tmp += (line->flags == (line->flags | PLUS) || line->num_u) ? 1 : 0;
@@ -270,18 +283,19 @@ void	i_type(t_str *line, char base)
 		loop_p(line, &base);
 		!line->num_u ? base_num(line, line->num) : base_num_u(line, line->num_u);
 		loop_w(line, 1);
-		return ;
+		return (0);
 	}
 	if (!line->precision && (line->flags == (line->flags | ZERO)) && (line->flags == (line->flags | PLUS)) && !line->num_u && (line->letter = 'A'))
 		*line->ptr++ = '+';
 	loop_w(line, (!line->precision && (line->flags == (line->flags | ZERO))) ? 0 : 1);
-	if (line->num_u)
-		*line->ptr++ = '-';
+	 if (line->num_u && *line->type != 'f')
+	 	*line->ptr++ = '-';
 	if (line->flags == (line->flags | PLUS) && !line->num_u && (line->letter == 'a'))
 		*line->ptr++ = '+';
 	if (line->precision || (line->flags == (line->flags | ZERO)))
 		loop_p(line, &base);	
 	!line->num_u ? base_num(line, line->num) : base_num_u(line, line->num_u);
+	return (0);
 }
 
 void	get_num(t_str *line, va_list list)
@@ -299,10 +313,10 @@ void	get_num(t_str *line, va_list list)
 			line->num = (line->specifier[1] == 'l') ? (intmax_t)va_arg(list, long long int) : (intmax_t)va_arg(list, long int);
 		else if (line->specifier[0] == 'h')
 			line->num = line->specifier[1] == 'h' ? (intmax_t)((char)va_arg(list, int)) : (intmax_t)((short)va_arg(list, int));
-		line->num = (intmax_t)va_arg(list, int);
-		return ;
+		else
+			line->num = (intmax_t)va_arg(list, int);
 	}
-	if (line->specifier[0] == 'L')
+	else if (line->specifier[0] == 'L')
 		line->num_d = (long double)va_arg(list, long double);
 	else
 		line->num_d = (double)va_arg(list, double);
@@ -319,27 +333,69 @@ void	get_num_u(t_str *line, va_list list)
 		line->num_u = (uintmax_t)va_arg(list, unsigned int);
 }
 
-void sharp(t_str *line)
-{
-	*line->ptr++ = '0';
-	*line->ptr++ = 'x';
-}
-
 void	ft_abs(t_str *line)
 {
 	line->num_u = ~line->num + 1;
 }
 
-void	f_type(t_str *line)
+void	round_f(t_str *line)
 {
-	union ieee754_double pre;
+	int		i;
+	short	nums[100];
 
-	pre.d = line->num_d;
-	printf("%u", pre.ieee.exponent);
-	
+	i = 0;
+	ft_bzero(nums, sizeof(nums));
+	*line->ptr++ = '.';
+	while ((line->num_u = (line->num_u % line->num) * 10) && line->prec_f--)
+		nums[i++] = line->num_u / line->num;
+	if (line->num_u)
+	{
+		nums[i] = line->num_u / line->num;
+		while (nums[i - 1] >= 9)
+			if (nums[i] >= 5)
+				nums[i-- - 1] += 1;
+		nums[i - 1] += nums[i] >= 5 ? 1 : 0;
+	}
+	while (line->prec_f-- > 0)
+		nums[i++] = 0;
+	nums[line->precision] = -1;
+	i = 0;
+	while (nums[i] >= 0)
+	 	*line->ptr++ = '0' + (nums[i++] % 10);
+	if (!line->base)
+		while (line->width-- > line->precision + line->tmp + 1)
+			*line->ptr++ = ' ';
 }
 
-void	handler(t_str *line, va_list list)
+int	f_type(t_str *line)
+{
+	int						width;
+	union ieee754_double	pre;
+
+	line->num = (int)line->num_d;
+	if (line->num < 0)
+			ft_abs(line);
+	line->prec_f = !line->precision ? 6 : line->precision;
+	width = line->width;
+	line->width -= !line->precision ? 7 : line->precision + 1;
+	line->precision = 0;
+	i_type(line, base(line));
+	pre.d = line->num_d;
+	line->num = 1;
+	line->num <<= 52 - (pre.ieee.exponent - 1023); // 52 - exponenta = 52 - (exp - 1023)
+	line->num_u = (uintmax_t)pre.ieee.mantissa0 << 32 | pre.ieee.mantissa1;
+	line->precision = line->prec_f;
+	if ((line->flags == (line->flags | MINUS)) && (line->flags != (line->flags | SPACE)))
+	{
+		line->ptr -= width ? width - (line->tmp + line->prec_f + 1) : 0;
+		line->base = 0;
+	}
+	line->width = width;
+	round_f(line);
+	return (0);
+}
+
+int		handler(t_str *line, va_list list)
 {
 	if (*line->type == 's')
 		return (s_type(line, va_arg(list, char *)));
@@ -365,17 +421,16 @@ void	handler(t_str *line, va_list list)
 		return (i_type(line, base(line)));
 	}
 	if (*line->type == 'f')
-	{
-		f_type(line);
-		//i_type(line, base(line));
-	}
+		return (f_type(line));
+	return (0);
 }
 
-int		parsing(char **chunk, t_str *line, va_list list)
+void	parsing(const char **chunk, t_str *line, va_list list)
 {
 	parser_one(chunk, line);
 	if (!(parser_sec(line, chunk)))
-		handler(line, list);
+		if (handler(line, list))
+			;//handler_t;
 }
 
 int	ft_printf(const char *format, ...)
@@ -407,19 +462,15 @@ int		main()
 //	int   sum = 0;
 //	char *arr = "HelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorlHelloWorl";
 //	long int x = 9223372036854775808;
-	float x = 10.3;
-	long int y;
+	double x = -3.3;
 
-	y = (long int)x;
-
-	printf("%li\n",y);
-	
-	ft_printf("ft_printf\t\t||%f|\n", x);
+//	printf("%li\n",y);
+  	ft_printf("ft_printf\t\t||%f|\n", x);
 	printf("printf\t\t\t||%f|\n", x);
 	printf("====================================================\n");
 	ft_printf("ft_printf\t\t||%15f|\n", x);
 	printf("printf\t\t\t||%15f|\n", x);
-	printf("====================================================\n");
+ 	printf("====================================================\n");
 	ft_printf("ft_printf\t\t||%-15f|\n", x);
 	printf("printf\t\t\t||%-15f|\n", x);
 	printf("====================================================\n");
@@ -443,7 +494,7 @@ int		main()
 	printf("====================================================\n");
 	ft_printf("ft_printf\t\t||%0+15.6f|\n", x);
 	printf("printf\t\t\t||%0+15.6f|\n", x);
-	printf("====================================================\n");
+ 	printf("====================================================\n");
 	ft_printf("ft_printf\t\t||% 0.9f|\n", x);
 	printf("printf\t\t\t||% 0.9f|\n", x);
 	printf("====================================================\n");
@@ -486,10 +537,43 @@ int		main()
 	ft_printf("ft_printf\t\t||%9.7f|\n", x);
 	printf("printf\t\t\t||%9.7f|\n", x);
 	printf("====================================================\n");
-	ft_printf("ft_printf\t\t||%9.11f|\n", x);
-	printf("printf\t\t\t||%9.11f|\n", x);
+	ft_printf("ft_printf\t\t||%9.17f|\n", x);
+	printf("printf\t\t\t||%9.17f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.34f|\n", x);
+	printf("printf\t\t\t||%9.34f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.33f|\n", x);
+	printf("printf\t\t\t||%9.33f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.32f|\n", x);
+	printf("printf\t\t\t||%9.32f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.31f|\n", x);
+	printf("printf\t\t\t||%9.31f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.30f|\n", x);
+	printf("printf\t\t\t||%9.30f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.22f|\n", x);
+	printf("printf\t\t\t||%9.22f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.26f|\n", x);
+	printf("printf\t\t\t||%9.26f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.27f|\n", x);
+	printf("printf\t\t\t||%9.27f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.28f|\n", x);
+	printf("printf\t\t\t||%9.28f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.50f|\n", x);
+	printf("printf\t\t\t||%9.50f|\n", x);
+	printf("====================================================\n");
+	ft_printf("ft_printf\t\t||%9.80f|\n", x);
+	printf("printf\t\t\t||%9.80f|\n", x);
 
-/* 	ft_printprintf|f("%li|\n", x);
+/*   	ft_printf("%li|\n", x);
 	ft_printf("%15li|\n", x);
 	ft_printf("%-15li|\n", x);
 	ft_printf("%- .15li|\n", x);
@@ -515,13 +599,13 @@ int		main()
 	ft_printf("%9.7li|\n", x);
 	ft_printf("%9.11li|\n", x); */
 
-//	ft_printf("%-#7i|\n", x);
-//	ft_printf("%-07i|\n", x);
-//	ft_printf("%-7i|\n", x);
-//	ft_printf("%#9.5i|\n", x); 
-//	ft_printf("%-#9i|\n", x);
-//	ft_printf("%-7.5i|\n", x);
-//	ft_printf("%-#.5i|\n", x); 
+	// ft_printf("%-#7i|\n", x);
+	// ft_printf("%-07i|\n", x);
+	// ft_printf("%-7i|\n", x);
+	// ft_printf("%#9.5i|\n", x); 
+	// ft_printf("%-#9i|\n", x);
+	// ft_printf("%-7.5i|\n", x);
+	// ft_printf("%-#.5i|\n", x); 
 	// ft_printf("%-#6i|\n", x);
  	// ft_printf("%#9.9i|\n", x);
 	// ft_printf("%7.12i|\n", x);
@@ -552,12 +636,12 @@ int		main()
 	// ft_printf("%9.4i|\n", x);
 	// ft_printf("%9.7i|\n", x);
 	// ft_printf("%9.11i|\n", x);
-// 	ft_printf("%0#9.4i|\n", x);
-//	ft_printf("% #9.4i|\n", x);
-//	ft_printf("% 9.4i|\n", x);
-//	ft_printf("%9.4i|\n", x);
-//	ft_printf("%9.7i|\n", x);
-//	ft_printf("%9.11i|\n", x);
+	// ft_printf("%0#9.4i|\n", x);
+	// ft_printf("% #9.4i|\n", x);
+	// ft_printf("% 9.4i|\n", x);
+	// ft_printf("%9.4i|\n", x);
+	// ft_printf("%9.7i|\n", x);
+	// ft_printf("%9.11i|\n", x);
 
 	printf("====================================================\n");
 
@@ -588,7 +672,7 @@ int		main()
 	printf("%9.7i|\n", x);
 	printf("%9.11i|\n", x);
  */
-/* 	printf("%li|\n", x);
+/*  	printf("%li|\n", x);
 	printf("%15li|\n", x);
 	printf("%-15li|\n", x);
 	printf("%- .15li|\n", x);
