@@ -39,7 +39,7 @@ int	f_type(t_str *line)
 	int						width;
 	union ieee754_double	pre;
 
-	line->num = (int)line->num_d;
+	line->num = (uintmax_t)line->num_d;
 	if (line->num < 0)
 			ft_abs(line);
 	line->prec_f = !line->precision ? 6 : line->precision;

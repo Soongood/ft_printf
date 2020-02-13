@@ -30,7 +30,7 @@ void	get_num_u(t_str *line, va_list list)
 		line->num_u = ((line->specifier[1] == 'l') || (line->specifier[0] == 'L')) ? 
 			(uintmax_t)va_arg(list, unsigned long long int) : (uintmax_t)va_arg(list, unsigned long int);
 	else if (line->specifier[0] == 'h')
-		line->num_u = line->specifier[1] == 'h' ? (uintmax_t)((char)va_arg(list, unsigned int)) : (uintmax_t)((short)va_arg(list, unsigned int));
+		line->num_u = line->specifier[1] == 'h' ? (uintmax_t)((unsigned char)va_arg(list, unsigned int)) : (uintmax_t)((unsigned short)va_arg(list, unsigned int));
 	else
 		line->num_u = (uintmax_t)va_arg(list, unsigned int);
 }

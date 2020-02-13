@@ -2,6 +2,8 @@
 
 void sharp(t_str *line)
 {
+	if (*line->type != 'p' && !line->num_u)
+		return ;
 	*line->ptr++ = '0';
 	*line->ptr++ = 'x';
 }
