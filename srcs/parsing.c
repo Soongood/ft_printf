@@ -52,6 +52,5 @@ void            parsing(const char **chunk, t_str *line, va_list list)
 {
 	parser_one(chunk, line);
 	if (!(parser_sec(line, chunk)))
-		if (handler(line, list))
-			;//handler_bonus;
+		handler(line, list);
 }
