@@ -37,6 +37,8 @@ int		base_num(t_str *line, intmax_t number)
 {
 	if (number >= line->base)
 		base_num(line, number / line->base);
+	if (line->precision == -1)
+	  	return (EXIT_SUCCESS);
 	*line->ptr++ = '0' + number % line->base;
 	return (EXIT_SUCCESS);
 }

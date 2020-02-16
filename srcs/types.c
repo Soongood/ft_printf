@@ -120,17 +120,15 @@ int		i_type(t_str *line, char base)
 		loop_w(line, 1);
 		return (EXIT_SUCCESS);
 	}
-	if (!line->precision && (line->flags == (line->flags | ZERO)) && (line->flags == (line->flags | PLUS)) && !line->num_u && (line->letter = 'A'))
+	if ((line->precision == -1) && (line->flags == (line->flags | ZERO)) && (line->flags == (line->flags | PLUS)) && !line->num_u && (line->letter = 'A'))
 		*line->ptr++ = '+';
-	loop_w(line, (!line->precision && (line->flags == (line->flags | ZERO))) ? 0 : 1);
+	loop_w(line, ((line->precision == -1) && (line->flags == (line->flags | ZERO))) ? 0 : 1);
 	if (line->num_u && *line->type != 'f')
 	 	*line->ptr++ = '-';
 	if (line->flags == (line->flags | PLUS) && !line->num_u && (line->letter == 'a'))
 		*line->ptr++ = '+';
 	if (line->precision || (line->flags == (line->flags | ZERO)))
 		loop_p(line, &base);
-	// if (!line->num && !line->num_u)
-	// 	return (EXIT_SUCCESS);
 	!line->num_u ? base_num(line, line->num) : base_num_u(line, line->num_u);
 	return (EXIT_SUCCESS);
 }
