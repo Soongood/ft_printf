@@ -35,7 +35,7 @@ int		s_type(t_str *line, char *string)
 		if((line->flags == (line->flags | MINUS)) && (flag = -1))
 			while (line->precision ? *string && tmp_pre-- : *string)
 				*line->ptr++ = *string++;
-		while (line->precision ? line->width-- > line->precision : line->width-- > size) // Было while (line->precision ? line->width-- > line->precision : line->width-- > size)
+		while (line->precision ? line->width-- > line->precision : line->width-- > size)
 			*line->ptr++ = ' ';
 		if (flag == -1)
 			return (EXIT_SUCCESS);
@@ -73,7 +73,7 @@ int		p_type(t_str *line, uintmax_t pointer)
 int		u_type(t_str *line, char u_base)
 {
 	line->tmp = u_base > line->precision ? u_base : line->precision;
-	line->tmp += ((*line->type == 'x' || *line->type == 'X') && (line->flags == (line->flags | SHARP))) ? 2 : 0;
+	line->tmp += ((*line->type == 'x' || *line->type == 'X') && line->num_u && (line->flags == (line->flags | SHARP))) ? 2 : 0;
 	if ((line->flags == (line->flags | MINUS)))
 	{
 		if (((*line->type == 'x' || *line->type == 'X') && (line->flags == (line->flags | SHARP))))
@@ -83,7 +83,7 @@ int		u_type(t_str *line, char u_base)
 		loop_w(line, 1);
 		return (EXIT_SUCCESS);
 	}
-	if (line->precision || !line->flags)
+	if (line->precision > 0 || !line->flags || (line->flags == (line->flags | PLUS)))
 	{
 		loop_w(line, 1);
 		if ((*line->type == 'x' || *line->type == 'X') && (line->flags == (line->flags | SHARP)))
@@ -120,17 +120,15 @@ int		i_type(t_str *line, char base)
 		loop_w(line, 1);
 		return (EXIT_SUCCESS);
 	}
-	if (!line->precision && (line->flags == (line->flags | ZERO)) && (line->flags == (line->flags | PLUS)) && !line->num_u && (line->letter = 'A'))
+	if (line->precision == -1 && (line->flags == (line->flags | ZERO)) && (line->flags == (line->flags | PLUS)) && !line->num_u && (line->letter = 'A'))
 		*line->ptr++ = '+';
-	loop_w(line, (!line->precision && (line->flags == (line->flags | ZERO))) ? 0 : 1);
-	if (line->num_u && *line->type != 'f')
-	 	*line->ptr++ = '-';
+	loop_w(line, (line->precision == -1 && (line->flags == (line->flags | ZERO))) ? 0 : 1);
+	if (line->num_u && *line->type != 'f' && line->precision != -1)
+	  	*line->ptr++ = '-';
 	if (line->flags == (line->flags | PLUS) && !line->num_u && (line->letter == 'a'))
 		*line->ptr++ = '+';
 	if (line->precision || (line->flags == (line->flags | ZERO)))
 		loop_p(line, &base);
-	// if (!line->num && !line->num_u)
-	// 	return (EXIT_SUCCESS);
 	!line->num_u ? base_num(line, line->num) : base_num_u(line, line->num_u);
 	return (EXIT_SUCCESS);
 }

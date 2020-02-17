@@ -25,7 +25,7 @@ static void     parser_one(const char **chunk, t_str *line)
 			*(tmp + i) = *(*chunk)++;
 			result = 10 * result + (*(tmp + i++) - '0');
 		}
-	line->precision = result;
+	line->precision = !i ? -1 : result;
 }
 
 static int      parser_sec(t_str *line, const char **chunk)

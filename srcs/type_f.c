@@ -12,7 +12,8 @@ void	round_f(t_str *line)
 
 	i = 0;
 	ft_bzero(nums, sizeof(nums));
-	*line->ptr++ = '.';
+	if (line->precision)
+		*line->ptr++ = '.';
 	while ((line->num_u = (line->num_u % line->num) * 10) && line->prec_f--)
 		nums[i++] = line->num_u / line->num;
 	if (line->num_u)
@@ -42,10 +43,11 @@ int	f_type(t_str *line)
 	line->num = (uintmax_t)line->num_d;
 	if (line->num < 0)
 			ft_abs(line);
-	line->prec_f = !line->precision ? 6 : line->precision;
+	line->prec_f = line->precision == -1 ? 6 : line->precision;
 	width = line->width;
-	line->width -= !line->precision ? 7 : line->precision + 1;
-	line->precision = 0;
+	if (line->precision)
+		line->width -= line->precision == -1 ? 7 : line->precision + 1;
+	line->precision = !line->prec_f ? 0 : -1;
 	i_type(line, base(line));
 	pre.d = line->num_d;
 	line->num = 1;
