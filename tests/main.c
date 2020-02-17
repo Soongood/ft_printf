@@ -16,6 +16,7 @@ int		main()
 	char	*str;
 	char	c;
 
+
 //	int x = 123;
 
 // 	printf("\nprintf(\"%%15.4s\", \"42\")\n");
