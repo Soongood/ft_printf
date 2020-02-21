@@ -1,0 +1,57 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "msbuild",
+            "args": [
+                "/property:GenerateFullPaths=true",
+                "/t:build",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "type": "shell",
+            "label": "clang build active file",
+            "command": "/usr/bin/clang",
+            "args": [
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "gcc build active file",
+            "command": "gcc",
+            "args": [
+                "-g",
+                "-I",
+                "./includes",
+                "${fileDirname}/*.c",
+                "${workspaceFolder}/srcs/*.c",
+                "-Llibft",
+                "-lft",
+                "-o",
+                "test"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "makefile",
+            "command": "make",
+            "args": [
+                "test"
+            ]
+        }
+    ]
+}

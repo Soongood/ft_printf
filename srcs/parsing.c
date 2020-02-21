@@ -1,37 +1,24 @@
 #include "../includes/ft_printf.h"
 
-static void     parser_one(const char **chunk, t_str *line)
+static void     parser_one(const char **chunk, t_str *line, va_list list)
 {
-	char	i;
-	char	tmp[5];
-	long	result;
-
-	i = 0;
-	result = 0;
 	is_flags(line, chunk);
-	ft_bzero(&tmp, sizeof(tmp));
-	while (ft_isdigit(**chunk))
+	line->width = (**chunk == '*' && (*chunk)++) ? va_arg(list, int) : get_res(chunk);
+	if (**chunk == '.' && (*chunk)++)
+		line->precision = (**chunk == '*' && (*chunk)++) ? va_arg(list, int) : get_res(chunk);
+	if (line->width < 0)
 	{
-		*(tmp + i) = *(*chunk)++;
-		result = 10 * result + (*(tmp + i++) - '0');
+		line->width = ~line->width + 1;
+		line->flags |= MINUS;
 	}
-	if (*tmp)
-		line->width = result, ft_bzero(&tmp, i);
-	i = 0;
-	result = 0;
-	if (**chunk == '.' ? *(*(chunk))++ : NOTHING)
-		while (ft_isdigit(**chunk))
-		{
-			*(tmp + i) = *(*chunk)++;
-			result = 10 * result + (*(tmp + i++) - '0');
-		}
-	line->precision = !i ? -1 : result;
+	if (line->precision < -1)
+			line->precision = -1;
 }
 
 static int      parser_sec(t_str *line, const char **chunk)
 {
 	if (is_type(**chunk))
-		line->type[0] = *(*chunk)++;
+		line->type = *(*chunk)++;
 	else if (*(*chunk + 1))
 	{
 		if (is_specifier(**chunk) && (**chunk == *(*chunk + 1)) && is_type(*(*chunk + 2)))
@@ -41,16 +28,16 @@ static int      parser_sec(t_str *line, const char **chunk)
 		else
 			return (EXIT_FAILURE);
 		line->specifier[0] = *(*chunk)++;
-		line->type[0] = *(*chunk)++;
+		line->type = *(*chunk)++;
 	}
 	else
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
-void            parsing(const char **chunk, t_str *line, va_list list)
+void	parsing(const char **chunk, t_str *line, va_list list)
 {
-	parser_one(chunk, line);
+	parser_one(chunk, line, list);
 	if (!(parser_sec(line, chunk)))
 		handler(line, list);
 }

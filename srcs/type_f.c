@@ -13,7 +13,8 @@ void	round_f(t_str *line)
 	i = 0;
 	ft_bzero(nums, sizeof(nums));
 	if (line->precision)
-		*line->ptr++ = '.';
+		ptr_mv(line, '.');
+//		*line->ptr++ = '.';
 	while ((line->num_u = (line->num_u % line->num) * 10) && line->prec_f--)
 		nums[i++] = line->num_u / line->num;
 	if (line->num_u)
@@ -29,10 +30,12 @@ void	round_f(t_str *line)
 	nums[line->precision] = -1;
 	i = 0;
 	while (nums[i] >= 0)
-	 	*line->ptr++ = '0' + (nums[i++] % 10);
+		ptr_mv(line, '0' + (nums[i++] % 10));
+//	 	*line->ptr++ = '0' + (nums[i++] % 10);
 	if (!line->base)
 		while (line->width-- > line->precision + line->tmp + 1)
-			*line->ptr++ = ' ';
+			ptr_mv(line, ' ');
+//			*line->ptr++ = ' ';
 }
 
 int	f_type(t_str *line)
@@ -56,7 +59,7 @@ int	f_type(t_str *line)
 	line->precision = line->prec_f;
 	if ((line->flags == (line->flags | MINUS)) && (line->flags != (line->flags | SPACE)))
 	{
-		line->ptr -= width ? width - (line->tmp + line->prec_f + 1) : 0;
+		line->ptr -= width ? width - (line->tmp + line->prec_f + 1) : 0; // что будет с ленгз?
 		line->base = 0;
 	}
 	line->width = width;
