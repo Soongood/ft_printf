@@ -3,6 +3,7 @@
 
 # define NOTHING 0
 # define BUF_SIZE 1000
+# define BUF_LIMIT 999
 
 # define MINUS 1
 # define PLUS 2
@@ -11,11 +12,38 @@
 # define ZERO 16
 
 #include "libft.h"
-#include <ieee754.h>
+#include <float.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <stdio.h>
+
+#ifndef _IEEE754_H
+
+#define _IEEE754_H 1
+#include <endian.h>
+
+__BEGIN_DECLS
+
+union ieee754_double
+  {
+    double d;
+
+    struct
+    {
+	unsigned int mantissa1:32;
+	unsigned int mantissa0:20;
+	unsigned int exponent:11;
+	unsigned int negative:1;
+	} ieee;
+
+};
+
+__END_DECLS
+
+#else
+#include <ieee754.h>
+#endif
 
 typedef struct			s_str
 {
@@ -53,8 +81,9 @@ char	base(t_str *line);
 char	u_base(t_str *line);
 void	ft_abs(t_str *line);
 void    sharp(t_str *line);
-void	init_str(t_str *line);
 void	round_f(t_str *line);
+void	init_str(t_str *line);
+void    print_buf(t_str *line);
 void	loop_w(t_str *line, char num);
 void	loop_p(t_str *line, char *u_base);
 void	get_num(t_str *line, va_list list);

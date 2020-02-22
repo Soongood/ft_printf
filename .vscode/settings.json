@@ -2,6 +2,11 @@
     "files.associations": {
         "cmath": "c",
         "math.h": "c",
-        "ft_printf.h": "c"
+        "ft_printf.h": "c",
+        "ieee754.h": "c",
+        "endian.h": "c",
+        "inttypes.h": "c",
+        "libft.h": "c",
+        "float.h": "c"
     }
 }
