@@ -18,31 +18,33 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#ifndef _IEEE754_H
+#if defined __APPLE__ || defined __MACH__
 
-#define _IEEE754_H 1
-#include <endian.h>
-
-__BEGIN_DECLS
+#include <machine/endian.h>
 
 union ieee754_double
-  {
+{
     double d;
 
     struct
     {
+#if	BYTE_ORDER == BIG_ENDIAN
+	unsigned int negative:1;
+	unsigned int exponent:11;
+	unsigned int mantissa0:20;
+	unsigned int mantissa1:32;
+#else
 	unsigned int mantissa1:32;
 	unsigned int mantissa0:20;
 	unsigned int exponent:11;
 	unsigned int negative:1;
-	} ieee;
-
+#endif
+    } ieee;
 };
-
-__END_DECLS
 
 #else
 #include <ieee754.h>
+
 #endif
 
 typedef struct			s_str
