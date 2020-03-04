@@ -1,56 +1,60 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   base.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/02/23 15:17:35 by trobbin           #+#    #+#             */
+/*   Updated: 2020/03/04 16:53:16 by trobbin          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/ft_printf.h"
 
-char	u_base(t_str *line)
+char	u_base(t_str *ln)
 {
 	uintmax_t tmp;
 
-	line->tmp = 1;
-	tmp = line->num_u;
-	while (tmp /= line->base)
-		line->tmp++;
-	return (line->tmp);
+	ln->tmp = 1;
+	tmp = ln->num_u;
+	while (tmp /= ln->base)
+		ln->tmp++;
+	return (ln->tmp);
 }
 
-char	base(t_str *line)
+char	base(t_str *ln)
 {
 	intmax_t tmp;
 
-	line->tmp = 1;
-	tmp = line->num;
-	while (tmp /= line->base)
-		line->tmp++;
-	return (line->tmp);
+	ln->tmp = 1;
+	tmp = ln->num;
+	while (tmp /= ln->base)
+		ln->tmp++;
+	return (ln->tmp);
 }
 
-int		base_num_u(t_str *line, uintmax_t number)
+int		base_num_u(t_str *ln, uintmax_t number)
 {
 	char		num;
 
-	if (number >= (uintmax_t)line->base)
-		base_num_u(line, number / line->base);
-	num = number % line->base;
-	if (line->precision || (!line->precision && (line->num)))
-		ptr_mv(line, (num >= 10) ? line->letter + num - 10 : '0' + num);
-	else if (line->flags == (line->flags | PLUS) && !line->precision)
-		ptr_mv(line, ' ');
-	else
-	 	line->width++;
+	if (number >= (uintmax_t)ln->base)
+		base_num_u(ln, number / ln->base);
+	num = number % ln->base;
+	if (ln->ty == 'p' && ln->pre == 1 && !ln->num_u && ln->letter != 'A')
+		return (EXIT_SUCCESS);
+	if (ln->pre || (!ln->pre && (ln->num || ln->num_u)))
+		ptr_mv(ln, (num >= 10) ? ln->letter + num - 10 : '0' + num);
 	return (EXIT_SUCCESS);
 }
 
-int		base_num(t_str *line, intmax_t number)
+int		base_num(t_str *ln, intmax_t number)
 {
-	if (number >= line->base)
-		base_num(line, number / line->base);
-	if ((line->precision || (!line->precision && (line->num))) || line->type == 'f')
-		ptr_mv(line, '0' + number % line->base);
-	else if (!line->num && !line->num_u && line->flags == (line->flags | PLUS) && line->width)
-	{
-		line->ptr--;
-		ptr_mv(line, ' ');
-		ptr_mv(line, '+');
-	}
+	if (number >= ln->base)
+		base_num(ln, number / ln->base);
+	if ((ln->pre || (!ln->pre && (ln->num))) || ln->ty == 'f')
+		ptr_mv(ln, '0' + number % ln->base);
 	else
-	 	line->width++;
+		ln->width++;
 	return (EXIT_SUCCESS);
 }

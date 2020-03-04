@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   is.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/02/23 15:17:55 by trobbin           #+#    #+#             */
+/*   Updated: 2020/02/27 16:15:45 by trobbin          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/ft_printf.h"
 
 int		is_specifier(char chunk)
@@ -13,20 +25,21 @@ int		is_type(char chunk)
 			chunk == 'f' || chunk == 'b');
 }
 
-void	is_flags(t_str *line, const char **chunk)
+void	is_flags(t_str *ln, const char **chunk)
 {
-	while (**chunk == ' ' || **chunk == '#' || **chunk == '+' || **chunk == '-' || **chunk == '0')
+	while (**chunk == ' ' || **chunk == '#' ||
+			**chunk == '+' || **chunk == '-' || **chunk == '0')
 	{
 		if (**chunk == '-')
-			line->flags |= MINUS;
+			ln->fl |= MINUS;
 		else if (**chunk == '+')
-			line->flags |= PLUS;
+			ln->fl |= PLUS;
 		else if (**chunk == ' ')
-			line->flags |= SPACE;
+			ln->fl |= SPACE;
 		else if (**chunk == '0')
-			line->flags |= ZERO;
+			ln->fl |= ZERO;
 		else if (**chunk == '#')
-			line->flags |= SHARP;
+			ln->fl |= SHARP;
 		(*chunk)++;
 	}
 }

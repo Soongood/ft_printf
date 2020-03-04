@@ -1,31 +1,42 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handler.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/02/23 15:17:52 by trobbin           #+#    #+#             */
+/*   Updated: 2020/03/04 18:20:05 by trobbin          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/ft_printf.h"
 
-int		handler(t_str *line, va_list list)
+int	handler(t_str *ln, va_list list)
 {
-	if (line->type == 's')
-		return (s_type(line, va_arg(list, char *)));
-	if (line->type == 'c'|| line->type == 'b')
-		return (c_type(line, va_arg(list, int)));
-	if (line->type == 'p')
-		return (p_type(line, (uintmax_t)va_arg(list, void *)));
-	if ((line->type == 'x' || line->type == 'X' || line->type == 'o' || line->type == 'u'))
+	if (ln->ty == 's')
+		return (s_type(ln, va_arg(list, char *)));
+	if (ln->ty == 'c' || ln->ty == 'b')
+		return (c_type(ln, va_arg(list, int)));
+	if (ln->ty == 'p')
+		return (p_type(ln, (uintmax_t)va_arg(list, void *)));
+	if ((ln->ty == 'x' || ln->ty == 'X' || ln->ty == 'o' || ln->ty == 'u'))
 	{
-		get_num_u(line, list);
-		if (line->type == 'o')
-			line->base = 8;
-		else if ((line->type == 'x' || line->type == 'X') && (line->base = 16))
-				if (line->type == 'X')
-					line->letter = 'A';
-		return (u_type(line, u_base(line)));
+		get_num_u(ln, list);
+		if (ln->ty == 'o' && (ln->base = 8))
+			ln->pre -= !ln->pre && !ln->num_u && ln->fl == (ln->fl | SHARP) ? 1 : NOTHING;
+		else if ((ln->ty == 'x' || ln->ty == 'X') && (ln->base = 16))
+			ln->letter = ln->ty == 'X' ? 'A' : 'a';
+		return (u_type(ln, u_base(ln)));
 	}
-	get_num(line, list);
-	if (line->type == 'd' || line->type == 'i')
+	get_num(ln, list);
+	if (ln->ty == 'd' || ln->ty == 'i')
 	{
-		if (line->num < 0)
-			ft_abs(line);
-		return (i_type(line, base(line)));
+		if (ln->num < 0)
+			ft_abs(ln);
+		return (i_type(ln, base(ln)));
 	}
-	if (line->type == 'f')
-		return (f_type(line));
+	if (ln->ty == 'f')
+		return (f_type(ln));
 	return (EXIT_SUCCESS);
 }

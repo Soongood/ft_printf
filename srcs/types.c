@@ -1,161 +1,138 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   types.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/02/23 15:18:10 by trobbin           #+#    #+#             */
+/*   Updated: 2020/03/04 18:16:53 by trobbin          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/ft_printf.h"
 
-int	c_type(t_str *line, int letter)
+int		c_type(t_str *ln, int letter)
 {
-	if (line->type == 'b')
+	if (ln->ty == 'b')
+		return (binary(ln, &letter));
+	if (ln->width)
+		if ((ln->fl == (ln->fl | MINUS)) && (ln->letter = 'A'))
+			ptr_mv(ln, letter);
+	while (--ln->width > 0)
+		ptr_mv(ln, ln->fl == (ln->fl | ZERO) && ln->fl != (ln->fl | MINUS)
+			? '0' : ' ');
+	if (ln->letter == 'a')
 	{
-		if (letter < 0)
-		{
-			line->num_u = ~letter + 1;
-			line->flags &= 253;
-		}
-		if (!letter)
-				sharp(line);
-		line->base = 2;
-		p_type(line, line->num_u ? line->num_u : (uintmax_t)letter);
-		return (EXIT_SUCCESS);
-	}
-	if (line->width)
-		if((line->flags == (line->flags | MINUS)) && (line->letter = 'A'))
-			ptr_mv(line, letter);
-//			*line->ptr++ = letter;
-	while (--line->width > 0)
-		ptr_mv(line, ' ');
-//		*line->ptr++ = ' ';
-	if ((line->letter == 'a'))
 		if (letter)
-			ptr_mv(line, letter);
-//			*line->ptr++ = letter;
+			ptr_mv(ln, letter);
+		else if (!ln->prec_f)
+			ln->length++;
+	}
 	return (EXIT_SUCCESS);
 }
 
-int		s_type(t_str *line, char *string)
+int		s_type(t_str *ln, char *string)
 {
 	if (!string)
 	{
-		line->precision = line->precision < 6 && line->precision != -1 ? 0 : 6;
-		s_type(line, "(null)");
+		if (ln->pre == -1)
+			ln->pre = 6;
+		s_type(ln, "(null)");
 		return (EXIT_SUCCESS);
 	}
-	line->num = (intmax_t)ft_strlen(string);
-	line->prec_f = line->precision;
-	if (line->width)
+	ln->num = (intmax_t)ft_strlen(string);
+	ln->prec_f = ln->pre;
+	if (ln->width)
 	{
-		if((line->flags == (line->flags | MINUS)) && (line->letter = 'A') && line->precision)
-			while (*string && line->prec_f--)
-				ptr_mv(line, *string++);
-//				*line->ptr++ = *string++;
-		while ((line->precision >= 0 && line->precision < line->num) ? line->width-- > line->precision : line->width-- > line->num)
-			ptr_mv(line, ' ');
-//			*line->ptr++ = ' ';
-		if (line->letter == 'A')
+		if ((ln->fl == (ln->fl | MINUS)) && (ln->letter = 'A') && ln->pre)
+			while (*string && ln->prec_f--)
+				ptr_mv(ln, *string++);
+		while ((ln->pre >= 0 && ln->pre < ln->num)
+				? ln->width-- > ln->pre : ln->width-- > ln->num)
+			ptr_mv(ln, ln->fl == (ln->fl | ZERO) && ln->fl != (ln->fl | MINUS)
+				? '0' : ' ');
+		if (ln->letter == 'A')
 			return (EXIT_SUCCESS);
 	}
-	while (*string && line->prec_f--)
-		ptr_mv(line, *string++);
-//		*line->ptr++ = *string++;
+	while (*string && ln->prec_f--)
+		ptr_mv(ln, *string++);
 	return (EXIT_SUCCESS);
 }
 
-int		p_type(t_str *line, uintmax_t pointer)
+int		p_type(t_str *ln, uintmax_t pointer)
 {
-	static char	rep = 3;
-
-	line->base = line->type == 'b' ? 2 : 16;
-	if (pointer >= (uintmax_t)line->base && rep++)
-		p_type(line, pointer / line->base);
-	if (rep != 3)
+	if (ln->ty == 'p')
 	{
-		while (((line->flags != (line->flags | ZERO) || ((line->flags == (line->flags | ZERO) && line->precision < line->width && line->precision != -1))) &&
-				(((line->flags == (line->flags | PLUS)) || (line->flags == (line->flags | SPACE))) ? --line->width > rep : line->width-- > rep)))
-			ptr_mv(line, ' ');
-//			*line->ptr++ = ' ';
-		if ((line->flags == (line->flags | PLUS)) || (line->flags == (line->flags | SPACE)))
-			ptr_mv(line, line->flags == (line->flags | PLUS) ? '+' : ' ');
-//			*line->ptr++ = line->flags == (line->flags | PLUS) ? '+' : ' ';
-		sharp(line);
-		while (((line->flags == (line->flags | ZERO)) && line->precision == -1 ? line->width-- > rep : line->precision-- > rep - 2))
-			ptr_mv(line, '0');
-//			*line->ptr++ = '0';
-		rep = 3;
+		ln->num_u = pointer;
+		ln->fl |= SHARP;
 	}
-	if (!pointer && line->type != 'b')
+	ln->base = ln->ty == 'p' ? 16 : 2;
+	if (!ln->pre || (ln->fl == (ln->fl | SPACE) && ln->pre == -1))
 	{
-		line->precision = 5;
-		s_type(line, "(nil)");
-		return (EXIT_SUCCESS);
+		if (ln->fl == (ln->fl | SPACE) && ln->pre == -1)
+			ln->letter = 'A';
+		else if (!ln->pre && !ln->num_u)
+			ln->width++;
+		ln->pre = 1;
 	}
-	line->tmp = pointer % line->base;
-	ptr_mv(line, (line->tmp >= 10) ? line->letter + line->tmp - 10 : '0' + line->tmp);
-//	*line->ptr++ = (line->tmp >= 10) ? line->letter + line->tmp - 10 : '0' + line->tmp;
+	u_type(ln, u_base(ln));
 	return (EXIT_SUCCESS);
 }
 
-int		u_type(t_str *line, char u_base)
+int		u_type(t_str *ln, char u_base)
 {
-	line->tmp = u_base > line->precision ? u_base : line->precision;
-	line->tmp += ((line->type == 'x' || line->type == 'X') && line->num_u && (line->flags == (line->flags | SHARP))) ? 2 : 0;
-	if ((line->flags == (line->flags | MINUS)))
+	ln->tmp = u_base > ln->pre ? u_base : ln->pre;
+	ln->tmp += ln->ty == 'o' && ln->fl == (ln->fl | SHARP) && ln->tmp != ln->pre  && ln-> num_u ? 1 : NOTHING;
+	ln->tmp += (((ln->ty == 'x' || ln->ty == 'X') && ln->num_u &&
+		(ln->fl == (ln->fl | SHARP))) || ln->ty == 'p'
+			|| ln->ty == 'b') ? 2 : 0;
+	ln->width += !ln->num_u && !ln->pre ? 1 : NOTHING;
+	if (ln->fl == (ln->fl | MINUS))
+		return (minus_u(ln, u_base));
+	if ((ln->pre > 0 || !ln->fl || (ln->fl == (ln->fl | PLUS))) ||
+		(ln->width > 0 && ln->fl != (ln->fl | ZERO)))
 	{
-		if (((line->type == 'x' || line->type == 'X') && (line->flags == (line->flags | SHARP))))
-			sharp(line);
-		loop_p(line, &u_base);
-		base_num_u(line, line->num_u);
-		loop_w(line, 1);
-		return (EXIT_SUCCESS);
-	}
-	if (line->precision > 0 || !line->flags || (line->flags == (line->flags | PLUS)))
-	{
-		loop_w(line, 1);
-		if ((line->type == 'x' || line->type == 'X') && (line->flags == (line->flags | SHARP)))
-			sharp(line);
-		loop_p(line, &u_base);	
+		loop_w(ln, 1);
+		if ((ln->fl == (ln->fl | SHARP) && ln->num_u)
+			|| ln->ty == 'p' || ln->ty == 'b')
+			sharp(ln);
+		loop_p(ln, &u_base);
 	}
 	else
 	{
-		if (((line->type == 'x' || line->type == 'X') && (line->flags == (line->flags | SHARP))))
-			sharp(line);
-		loop_w(line, 0);
+		if ((ln->fl == (ln->fl | SHARP) && ln->num_u) || ln->ty == 'p' ||
+			ln->ty == 'b' || (ln->ty == 'o' && !ln->num_u && !ln->pre))
+			sharp(ln);
+		loop_w(ln, 0);
 	}
-	base_num_u(line, line->num_u);
+	base_num_u(ln, ln->num_u);
 	return (EXIT_SUCCESS);
 }
 
-int		i_type(t_str *line, char base)
+int		i_type(t_str *ln, char base)
 {
-	line->tmp = base > line->precision ? base : line->precision;
-	line->tmp += (line->flags == (line->flags | PLUS) || line->num_u) ? 1 : 0;
-	if ((line->flags == (line->flags | SPACE)) && (line->flags != (line->flags | PLUS)) && (line->flags != (line->flags | SHARP)) && !line->num_u)
+	ln->tmp = base > ln->pre ? base : ln->pre;
+	ln->tmp += (ln->fl == (ln->fl | PLUS) || ln->num_u) ? 1 : 0;
+	ln->width += !ln->num && !ln->pre && ln->ty != 'f' && ln->fl != (ln->fl | MINUS) ? 1 : NOTHING;
+	if ((ln->fl == (ln->fl | SPACE)) && (ln->fl != (ln->fl | PLUS))
+		&& (ln->fl != (ln->fl | SHARP)) && !ln->num_u)
 	{
-		ptr_mv(line, ' ');
-//		*line->ptr++ = ' ';
-		line->width--;
+		ptr_mv(ln, ' ');
+		ln->width--;
 	}
-	if ((line->flags == (line->flags | MINUS)))
-	{
-		if (line->flags == (line->flags | PLUS) && !line->num_u)
-			ptr_mv(line, '+');
-//			*line->ptr++ = '+';
-		if (line->num_u)
-			ptr_mv(line, '-');
-//			*line->ptr++ = '-';
-		loop_p(line, &base);
-		!line->num_u ? base_num(line, line->num) : base_num_u(line, line->num_u);
-		loop_w(line, 1);
-		return (EXIT_SUCCESS);
-	}
-	if (line->precision == -1 && (line->flags == (line->flags | ZERO)) && (line->flags == (line->flags | PLUS)) && !line->num_u && (line->letter = 'A'))
-		ptr_mv(line, '+');
-//		*line->ptr++ = '+';
-	loop_w(line, (line->precision == -1 && (line->flags == (line->flags | ZERO))) ? 0 : 1);
-	if (line->num_u && line->type != 'f' && line->precision != -1)
-		ptr_mv(line, '-');	
-//		*line->ptr++ = '-';
-	if (line->flags == (line->flags | PLUS) && !line->num_u && (line->letter == 'a'))
-		ptr_mv(line, '+');
-//		*line->ptr++ = '+';
-	if (line->precision || (line->flags == (line->flags | ZERO)))
-		loop_p(line, &base);
-	!line->num_u ? base_num(line, line->num) : base_num_u(line, line->num_u);
+	if (ln->fl == (ln->fl | MINUS))
+		return (minus_i(ln, base));
+	if (ln->pre == -1 && (ln->fl == (ln->fl | ZERO)) &&
+		(ln->fl == (ln->fl | PLUS)) && !ln->num_u && (ln->letter = 'A'))
+		ptr_mv(ln, '+');
+	loop_w(ln, (ln->pre == -1 && (ln->fl == (ln->fl | ZERO))) ? 0 : 1);
+	if (ln->num_u && ln->ty != 'f' && ln->pre != -1)
+		ptr_mv(ln, '-');
+	if (ln->fl == (ln->fl | PLUS) && !ln->num_u && (ln->letter == 'a'))
+		ptr_mv(ln, '+');
+	if (ln->pre || (ln->fl == (ln->fl | ZERO)))
+		loop_p(ln, &base);
+	!ln->num_u ? base_num(ln, ln->num) : base_num_u(ln, ln->num_u);
 	return (EXIT_SUCCESS);
 }

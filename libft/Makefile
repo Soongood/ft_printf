@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: trobbin <marvin@42.fr>                     +#+  +:+       +#+         #
+#    By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/17 15:48:48 by trobbin           #+#    #+#              #
-#    Updated: 2019/09/24 21:54:05 by trobbin          ###   ########.fr        #
+#    Updated: 2020/02/27 13:50:45 by trobbin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,37 +19,37 @@ SRCS = $(addprefix $(SRCS_DIR), $(addsuffix .c, $(FUNCTIONS)))
 O_FILES = $(addprefix $(OBJ_DIR), $(addsuffix .o, $(FUNCTIONS)))
 vpath %.c $(SRCS_DIR)
 vpath %.h includes/
-PRINT = @echo "\e[0;34mBuilding... \t$(NAME)\t$@\e[0m"
+BLUE = \x1B[34m
+GREEN = \x1B[32m
+PRINT = echo "$(BLUE)Building... \t$(NAME)\t$@\x1B[0m"
 
 .PHONY: all clean fclean re
 
 all: $(NAME)
 
-$(NAME): $(O_FILES)
-	echo "\e[0;34mArchiving... \t$@\e[0m"
-	ar rc $(NAME) $(O_FILES)
-	ranlib $(NAME)
-	echo "\e[0;32m$@ is archived\e[0m"
-
-$(O_FILES): | $(OBJ_DIR)
+$(NAME): $(OBJ_DIR) $(O_FILES)
+	@echo "$(BLUE)Archiving... \t$@\x1B[0m"
+	@ar rc $(NAME) $(O_FILES)
+	@ranlib $(NAME)
+	@echo "$(GREEN)$@ is archived\x1B[0m"
 
 $(OBJ_DIR):
-	$(PRINT)
-	mkdir $(OBJ_DIR)
-	echo "\e[0;32mObject directory is created\e[0m"
+	@$(PRINT)
+	@mkdir $(OBJ_DIR)
+	@echo "$(GREEN)Object directory is created\x1B[0m"
 
-$(OBJ_DIR)%.o: %.c
-	$(PRINT)
-	gcc $(FLAGS) -o $@ -c $<
+$(OBJ_DIR)%.o: %.c | $(OBJ_DIR)
+	@$(PRINT)
+	@gcc $(FLAGS) -o $@ -c $<
 
 clean:
-	echo "\e[0;34mCleaning...\e[0m"
-	/bin/rm -fr $(OBJ_DIR)
-	echo "\e[0;32m$(NAME): Object files are removed\e[0m"
+	@echo "$(BLUE)Cleaning...\x1B[0m"
+	@/bin/rm -fr $(OBJ_DIR)
+	@echo "$(GREEN)$(NAME): Object files are removed\x1B[0m"
 
 fclean: clean
-	echo "\e[0;34mCleaning...\e[0m"
-	/bin/rm -f $(NAME)
-	echo "\e[0;32m$(NAME): Lib and obj files are removed\e[0m"
+	@echo "$(BLUE)Cleaning...\x1B[0m"
+	@/bin/rm -f $(NAME)
+	@echo "$(GREEN)$(NAME): Lib and obj files are removed\x1B[0m"
 
 re: fclean all

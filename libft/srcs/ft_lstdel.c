@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstdel.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trobbin <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/23 21:52:19 by trobbin           #+#    #+#             */
-/*   Updated: 2019/09/24 18:14:44 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/02/27 13:58:46 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
-
 
 void	ft_lstdel(t_list **alst, void (*del)(void *, size_t))
 {

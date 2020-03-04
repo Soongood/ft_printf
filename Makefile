@@ -1,56 +1,66 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2020/02/23 15:24:33 by trobbin           #+#    #+#              #
+#    Updated: 2020/03/04 15:58:57 by trobbin          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = libftprintf.a
 OBJ_DIR = obj/
 SRCS_DIR = srcs/
-FUN = ft_printf base get_num handler is parsing type_f types others
+FUN = ft_printf base get_num handler is parsing type_f types others buf binary minus
 SRCS = $(addsuffix .c, $(FUN))
 O_FILES = $(addprefix $(OBJ_DIR), $(addsuffix .o, $(FUN)))
 LIBFT = ./libft/libft.a
 CFLAGS = -Wall -Wextra -Werror -I ./includes
-PRINT = @echo "\e[0;34mBuilding... \t$(NAME)\t$@\e[0m"
+BLUE = \x1B[34m
+GREEN = \x1B[32m
+PRINT = echo "$(BLUE)Building... \t$(NAME)\t$@\x1B[0m"
 
-.DEFAULT_GOAL := default
-.PHONY: all clean fclean re default test
+.PHONY: all clean fclean re test
 
-default:
-	@$(MAKE) --no-print-directory all
+all: $(NAME)
 
-all: $(OBJ_DIR) $(NAME)
-
-$(OBJ_DIR):
-	$(PRINT)
-	@mkdir $(OBJ_DIR)
-	@echo "\e[0;32mObject directory is created\e[0m"
-
-$(NAME): $(O_FILES) $(LIBFT)
-	@echo "\e[0;34mCopying... \t$(LIBFT) to $(NAME)\e[0m"
+$(NAME): $(OBJ_DIR) $(O_FILES) $(LIBFT)
+	@echo "$(BLUE)Copying... \t$(LIBFT) to $(NAME)\x1B[0m"
 	@cp $(LIBFT) $(NAME)
-	@echo "\e[0;34mArchiving... \t$@\e[0m"
+	@echo "$(BLUE)Archiving... \t$@\x1B[0m"
 	@ar rc $(NAME) $(O_FILES)
 	@ranlib $(NAME)
-	@echo "\e[0;32m$@ is archived\e[0m"
+	@echo "$(GREEN)$@ is archived\x1B[0m"
 
-$(OBJ_DIR)%.o: $(SRCS_DIR)%.c
-	$(PRINT)
+$(OBJ_DIR)%.o: $(SRCS_DIR)%.c | $(OBJ_DIR)
+	@$(PRINT)
 	@gcc $(CFLAGS) -o $@ -c $<
 
+$(OBJ_DIR):
+	@$(PRINT)
+	@mkdir $(OBJ_DIR)
+	@echo "$(GREEN)Object directory is created\e[0m"
+
 test: all
-	$(PRINT)
+	@$(PRINT)
 	@gcc -w tests/main.c -L. -lftprintf -o test
-	@echo "\e[0;32mTest file is created\e[0m"
+	@echo "$(GREEN)Test file is created\x1B[0m"
 
 $(LIBFT)::
 	@make --no-print-directory -C ./libft
 
 clean:
 	@make --no-print-directory -C ./libft clean
-	@echo "\e[0;34mCleaning...\e[0m"
+	@echo "$(BLUE)Cleaning...\x1B[0m"
 	@/bin/rm -fr $(OBJ_DIR)
-	@echo "\e[0;32m$(NAME): Object files are removed\e[0m"
+	@echo "$(GREEN)$(NAME): Object files are removed\x1B[0m"
 
 fclean: clean
 	@make --no-print-directory -C ./libft fclean
-	@echo "\e[0;34mCleaning...\e[0m"
+	@echo "$(BLUE)Cleaning...\x1B[0m"
 	@/bin/rm -f $(NAME) test
-	@echo "\e[0;32m$(NAME): Lib, obj and test files are removed\e[0m"
+	@echo "$(GREEN)$(NAME): Lib, obj and test files are removed\x1B[0m"
 
 re: fclean all
