@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:10 by trobbin           #+#    #+#             */
-/*   Updated: 2020/03/05 19:07:15 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 19:32:42 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,8 +115,7 @@ int		i_type(t_str *ln, char base)
 	ln->tmp = base > ln->pre ? base : ln->pre;
 	ln->tmp += (ln->fl == (ln->fl | PLUS) || ln->num_u) ? 1 : 0;
 	ln->width += !ln->num && !ln->pre && ln->ty != 'f' && ln->fl != (ln->fl | MINUS) ? 1 : NOTHING;
-	if ((ln->fl == (ln->fl | SPACE)) && (ln->fl != (ln->fl | PLUS))
-		&& (ln->fl != (ln->fl | SHARP)) && !ln->num_u)
+	if (ln->fl == (ln->fl | SPACE) && ln->fl != (ln->fl | PLUS) && !ln->num_u)
 	{
 		ptr_mv(ln, ' ');
 		ln->width--;

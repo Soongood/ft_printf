@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:08 by trobbin           #+#    #+#             */
-/*   Updated: 2020/03/05 19:08:11 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 19:38:08 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static void		fract(t_str *ln, short *nums, int *i)
 			break ;
 	if (*i)
 		nums[*i - 1] += nums[*i] >= 5 ? 1 : 0;
-	if (nums[0] > 5)
+	if (!ln->pre && nums[0] > 5)
 		round_i(ln);
 }
 
