@@ -6,7 +6,7 @@
 #    By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/23 15:24:33 by trobbin           #+#    #+#              #
-#    Updated: 2020/03/05 01:09:46 by trobbin          ###   ########.fr        #
+#    Updated: 2020/03/05 17:16:54 by trobbin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,7 @@ $(OBJ_DIR)%.o: $(SRCS_DIR)%.c | $(OBJ_DIR)
 $(OBJ_DIR):
 	@$(PRINT)
 	@mkdir $(OBJ_DIR)
-	@echo "$(GREEN)Object directory is created\e[0m"
+	@echo "$(GREEN)Object directory is created\x1B[0m"
 
 test: all
 	@$(PRINT)

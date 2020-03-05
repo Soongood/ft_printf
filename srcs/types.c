@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:10 by trobbin           #+#    #+#             */
-/*   Updated: 2020/03/04 23:52:15 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 19:07:15 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,8 @@ int		i_type(t_str *ln, char base)
 		ptr_mv(ln, '+');
 	if (ln->pre || (ln->fl == (ln->fl | ZERO)))
 		loop_p(ln, &base);
+	if (!(intmax_t)ln->num_d && ln->num < 0)
+		ln->num = 0;
 	!ln->num_u ? base_num(ln, ln->num) : base_num_u(ln, ln->num_u);
 	return (EXIT_SUCCESS);
 }

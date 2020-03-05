@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:15 by trobbin           #+#    #+#             */
-/*   Updated: 2020/03/05 01:55:57 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 19:05:20 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,11 @@ int		main()
 {
 	// float x = 10.3;
 	// float x = 10.6;
-	// float x = 9.6;
+	 float x = 9.6;
 	// float x = 10.5;
 	// float x = 10.45;
-	 float x = 8.6;
+	// float x = 8.6;
+	// float x = 199999.6;
 	//   float x = -10.12;
 	//	float x = -10.5;
 	//	float x = -10.45;
@@ -28,8 +29,7 @@ int		main()
 	// float x = 0;
 	// double x = 10.213;
 
-//    ft_printf("%f\n", -0.00032);
-//    printf("%f\n", -0.00032);
+
 // 	ft_printf("ft_printf\t\t||%5.d %5.0d|\n", 10, 0);
 // 	printf("printf\t\t\t||%5.d %5.0d|\n", 10, 0);
 // 	ft_printf("ft_printf\t\t||%Lf|\n", 1444565444646.64654242422421);
@@ -38,36 +38,36 @@ int		main()
 	// printf("=========================1==========================\n");
   	// ft_printf("ft_printf\t\t||%.0f|\n", x);
 	// printf("printf\t\t\t||%.0f|\n", x);
-	printf("=========================2==========================\n");
-	ft_printf("ft_printf\t\t||%-+4.0f|\n", x);
-	printf("printf\t\t\t||%-+4.0f|\n", x);
-	printf("=========================3==========================\n");
-	ft_printf("ft_printf\t\t||% 2.0f|\n", x);
-	printf("printf\t\t\t||% 2.0f|\n", x);
-	printf("=========================4==========================\n");
-	ft_printf("ft_printf\t\t||%10.0f|\n", x);
-	printf("printf\t\t\t||%10.0f|\n", x);
-	printf("=========================5==========================\n");
-	ft_printf("ft_printf\t\t||%-0.0f|\n", x);
-	printf("printf\t\t\t||%-0.0f|\n", x);
-	printf("=========================6==========================\n");
-	ft_printf("ft_printf\t\t||%-04.0f|\n", x);
-	printf("printf\t\t\t||%-04.0f|\n", x);
-	printf("=========================7==========================\n");
-	ft_printf("ft_printf\t\t||%-15.3f|\n", x);
-	printf("printf\t\t\t||%-15.3f|\n", x);
-	printf("=========================8==========================\n");
-	ft_printf("ft_printf\t\t||% 15.0f|\n", x);//косяк при 9.6
-	printf("printf\t\t\t||% 15.0f|\n", x);
-	printf("=========================9==========================\n");
-	ft_printf("ft_printf\t\t||%8.0f|\n", x); //косяк при 9.6
-	printf("printf\t\t\t||%8.0f|\n", x);
-	printf("=========================10=========================\n");
-	ft_printf("ft_printf\t\t||%15f|\n", x);
-	printf("printf\t\t\t||%15f|\n", x);
- 	printf("=========================11=========================\n");
-	ft_printf("ft_printf\t\t||%-15f|\n", x);
-	printf("printf\t\t\t||%-15f|\n", x);
+	// printf("=========================2==========================\n");
+	// ft_printf("ft_printf\t\t||%-+4f|\n", x);
+	// printf("printf\t\t\t||%-+4f|\n", x);
+	// printf("=========================3==========================\n");
+	// ft_printf("ft_printf\t\t||% 2.0f|\n", x);
+	// printf("printf\t\t\t||% 2.0f|\n", x);
+	// printf("=========================4==========================\n");
+	// ft_printf("ft_printf\t\t||%10.0f|\n", x);
+	// printf("printf\t\t\t||%10.0f|\n", x);
+	// printf("=========================5==========================\n");
+	// ft_printf("ft_printf\t\t||%-0.0f|\n", x);
+	// printf("printf\t\t\t||%-0.0f|\n", x);
+	// printf("=========================6==========================\n");
+	// ft_printf("ft_printf\t\t||%-04.0f|\n", x);
+	// printf("printf\t\t\t||%-04.0f|\n", x);
+	// printf("=========================7==========================\n");
+	// ft_printf("ft_printf\t\t||%-15.3f|\n", x);
+	// printf("printf\t\t\t||%-15.3f|\n", x);
+	// printf("=========================8==========================\n");
+	// ft_printf("ft_printf\t\t||% 15.0f|\n", x);//косяк при 9.6
+	// printf("printf\t\t\t||% 15.0f|\n", x);
+	// printf("=========================9==========================\n");
+	// ft_printf("ft_printf\t\t||%8.0f|\n", x); //косяк при 9.6
+	// printf("printf\t\t\t||%8.0f|\n", x);
+	// printf("=========================10=========================\n");
+	// ft_printf("ft_printf\t\t||%15f|\n", x);
+	// printf("printf\t\t\t||%15f|\n", x);
+ 	// printf("=========================11=========================\n");
+	// ft_printf("ft_printf\t\t||%-15f|\n", x);
+	// printf("printf\t\t\t||%-15f|\n", x);
 	printf("=========================12=========================\n");
 	ft_printf("ft_printf\t\t||%- .15f|\n", x);
 	printf("printf\t\t\t||%- .15f|\n", x);
