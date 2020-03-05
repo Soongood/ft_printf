@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:10 by trobbin           #+#    #+#             */
-/*   Updated: 2020/03/04 18:16:53 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/04 23:52:15 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int		c_type(t_str *ln, int letter)
 		if (letter)
 			ptr_mv(ln, letter);
 		else if (!ln->prec_f)
-			ln->length++;
+			ptr_mv(ln, '\0');
 	}
 	return (EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/27 16:54:15 by trobbin           #+#    #+#             */
-/*   Updated: 2020/02/27 18:54:05 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 02:23:31 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 # define FT_PRINTF_H
 
 # define NOTHING 0
-# define BUF_SIZE 1000
-# define BUF_LIMIT 999
+# define BUF_SIZE 512
 
 # define MINUS 1
 # define PLUS 2
@@ -30,6 +29,7 @@
 
 typedef struct			s_str
 {
+	char				*str_end;
 	char				*ptr;
 	long double			num_d;
 	intmax_t			num;
@@ -76,6 +76,6 @@ void					loop_p(t_str *line, char *u_base);
 void					get_num(t_str *line, va_list list);
 void					get_num_u(t_str *line, va_list list);
 void					is_flags(t_str *line, const char **chunk);
-void					parser(const char **c, t_str *ln, va_list l, int *len);
+void					parser(const char **chunk, t_str *len, va_list list);
 
 #endif

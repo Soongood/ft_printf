@@ -6,7 +6,7 @@
 #    By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/23 15:24:33 by trobbin           #+#    #+#              #
-#    Updated: 2020/03/04 15:58:57 by trobbin          ###   ########.fr        #
+#    Updated: 2020/03/05 01:09:46 by trobbin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ FUN = ft_printf base get_num handler is parsing type_f types others buf binary m
 SRCS = $(addsuffix .c, $(FUN))
 O_FILES = $(addprefix $(OBJ_DIR), $(addsuffix .o, $(FUN)))
 LIBFT = ./libft/libft.a
-CFLAGS = -Wall -Wextra -Werror -I ./includes
+CFLAGS = -Wall -Wextra -Werror -g -I ./includes
 BLUE = \x1B[34m
 GREEN = \x1B[32m
 PRINT = echo "$(BLUE)Building... \t$(NAME)\t$@\x1B[0m"
@@ -45,7 +45,7 @@ $(OBJ_DIR):
 
 test: all
 	@$(PRINT)
-	@gcc -w tests/main.c -L. -lftprintf -o test
+	@gcc -w -g tests/main.c -L. -lftprintf -o test
 	@echo "$(GREEN)Test file is created\x1B[0m"
 
 $(LIBFT)::

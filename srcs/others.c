@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:01 by trobbin           #+#    #+#             */
-/*   Updated: 2020/02/27 15:54:28 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 01:30:15 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,18 @@
 
 void	init_str(t_str *ln)
 {
+	int tmp;
 	static unsigned int size = sizeof(*ln) - BUF_SIZE;
 
 	if (!ln->length)
 		ft_bzero(ln, sizeof(*ln));
 	else
-		ft_bzero(ln, ln->length <= BUF_LIMIT ? size + ln->length : sizeof(*ln));
+	{
+		tmp = ln->length;
+		ft_bzero(ln, size + ln->ptr - ln->str);
+		ln->length = tmp;
+	}
+	ln->str_end = ln->str + BUF_SIZE;
 	ln->ptr = ln->str;
 	ln->letter = 'a';
 	ln->base = 10;

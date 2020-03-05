@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:08 by trobbin           #+#    #+#             */
-/*   Updated: 2020/02/27 19:04:36 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 03:17:12 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,9 @@ int				f_type(t_str *ln)
 		ft_abs(ln);
 	ln->prec_f = ln->pre == -1 ? 6 : ln->pre;
 	width = ln->width;
-	if (ln->pre)
+	if (ln->fl == (ln->fl | MINUS))
+		ln->width = 1;
+	else if (ln->pre)
 		ln->width -= ln->pre == -1 ? 7 : ln->pre + 1;
 	ln->pre = !ln->prec_f ? 0 : -1;
 	i_type(ln, base(ln));

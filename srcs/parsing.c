@@ -6,7 +6,7 @@
 /*   By: trobbin <trobbin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/23 15:18:04 by trobbin           #+#    #+#             */
-/*   Updated: 2020/02/27 18:24:21 by trobbin          ###   ########.fr       */
+/*   Updated: 2020/03/05 00:14:23 by trobbin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,15 +51,14 @@ static	int		parser_sec(t_str *ln, const char **chunk)
 	return (EXIT_SUCCESS);
 }
 
-void			parser(const char **chunk, t_str *ln, va_list list, int *ln_len)
+void			parser(const char **chunk, t_str *ln, va_list list)
 {
 	while (**chunk)
 		if (**chunk != '%' || (*(*chunk)++ == '%' && **chunk == '%'))
 		{
-			if (ln->length == BUF_LIMIT)
+			if (ln->ptr == ln->str_end)
 				print_buf(ln);
 			*ln->ptr++ = *(*chunk)++;
-			ln->length++;
 		}
 		else
 		{
@@ -71,9 +70,8 @@ void			parser(const char **chunk, t_str *ln, va_list list, int *ln_len)
 				ln->prec_f = 1;
 				c_type(ln, **chunk == '%' ? '%' : NOTHING);
 			}
-			*ln_len += ln->length;
-			write(STDOUT_FILENO, ln->str, ln->length <= BUF_LIMIT ?
-				ln->length : (int)ft_strlen(ln->str));
+			ln->length += ln->ptr - ln->str;
+			write(STDOUT_FILENO, ln->str, ln->ptr - ln->str);
 			init_str(ln);
 		}
 }
